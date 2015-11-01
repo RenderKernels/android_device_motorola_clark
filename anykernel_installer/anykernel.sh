@@ -1,4 +1,4 @@
-# AnyKernel 2.0 Ramdisk Mod Script 
+# AnyKernel 2.0 Ramdisk Mod Script
 # osm0sis @ xda-developers
 # modified by RenderBroken for the G2!
 
@@ -6,8 +6,8 @@
 # EDIFY properties
 kernel.string=Render Kernel by RenderBroken!
 do.devicecheck=0
-do.initd=1
-do.modules=1
+do.initd=0
+do.modules=0
 do.cleanup=0
 device.name1=
 device.name2=
@@ -16,7 +16,7 @@ device.name4=
 device.name5=
 
 # shell variables
-block=/dev/block/platform/msm_sdcc.1/by-name/boot;
+block=/dev/block/bootdevice/by-name/boot;
 initd=/system/etc/init.d;
 bindir=/system/bin;
 ## end setup
@@ -73,14 +73,14 @@ write_boot() {
   cp -rf $ramdisk/* $ramdisk-new;
   cd $ramdisk-new;
   find . | cpio -H newc -o | gzip > /tmp/anykernel/ramdisk-new.cpio.gz;
-  $bin/mkbootimg --kernel /tmp/anykernel/zImage --ramdisk /tmp/anykernel/ramdisk-new.cpio.gz $second --cmdline "$cmdline androidboot.selinux=permissive" --board "$board" --base $base --pagesize $pagesize --kernel_offset $kerneloff --ramdisk_offset $ramdiskoff $secondoff --tags_offset $tagsoff $dtb --output /tmp/anykernel/boot-new.img;
+  $bin/mkbootimg --kernel /tmp/anykernel/Image --ramdisk /tmp/anykernel/ramdisk-new.cpio.gz $second --cmdline "$cmdline androidboot.selinux=permissive" --board "$board" --base $base --pagesize $pagesize --kernel_offset $kerneloff --ramdisk_offset $ramdiskoff $secondoff --tags_offset $tagsoff $dtb --output /tmp/anykernel/boot-new.img;
   if [ $? != 0 -o `wc -c < /tmp/anykernel/boot-new.img` -gt `wc -c < /tmp/anykernel/boot.img` ]; then
     ui_print " "; ui_print "Repacking image failed. Aborting...";
     echo 1 > /tmp/anykernel/exitcode; exit;
   fi;
 # Bump that ish!
-  dd if=$bin/bump >> /tmp/anykernel/boot-new.img;
-  dd if=/tmp/anykernel/boot-new.img of=$block;
+#  dd if=$bin/bump >> /tmp/anykernel/boot-new.img;
+#  dd if=/tmp/anykernel/boot-new.img of=$block;
 }
 
 # backup_file <file>
@@ -157,11 +157,11 @@ dump_boot;
 # begin ramdisk changes
 
 # insert initd scripts
-cp -fp $patch/init.d/* $initd
-chmod -R 755 $initd
+#cp -fp $patch/init.d/* $initd
+#chmod -R 755 $initd
 
 # remove mpdecsion binary
-mv $bindir/mpdecision $bindir/mpdecision-rm
+#mv $bindir/mpdecision $bindir/mpdecision-rm
 
 # adb secure
 backup_file default.prop;
@@ -169,12 +169,11 @@ replace_string default.prop "ro.adb.secure=0" "ro.adb.secure=1" "ro.adb.secure=0
 replace_string default.prop "ro.secure=0" "ro.secure=1" "ro.secure=0";
 
 # init.g2.rc
-backup_file init.g2.rc;
-append_file init.g2.rc "render-post_boot" init.g2.patch;
+#backup_file init.g2.rc;
+#append_file init.g2.rc "render-post_boot" init.g2.patch;
 
 # end ramdisk changes
 
 write_boot;
 
 ## end install
-
