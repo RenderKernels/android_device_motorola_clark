@@ -1,0 +1,11 @@
+[
+  {
+    "repository":	"android_kernel_motorola_msm8992",
+    "target_path":	"kernel/motorola/msm8992"
+  },
+  {
+    "remote": "gh",
+    "repository":	"SlimRoms/android_prebuilts_gcc_linux-x86_aarch64_aarch64-linux-android-4.9",
+    "target_path":	"toolchains/aarch64-linux-android-4.9"
+  }
+]
